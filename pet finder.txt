@@ -1,0 +1,638 @@
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "HollowJoiner"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+local translations = {
+    ["US"] = "This script is paid, get it only at https://dsc.gg/hollowhub",
+    ["BR"] = "Esse script é pago, pegue ele apenas em https://dsc.gg/hollowhub",
+    ["PT"] = "Este script é pago, obtenha-o apenas em https://dsc.gg/hollowhub",
+    ["ES"] = "Este script es de pago, consíguelo solo en https://dsc.gg/hollowhub",
+    ["MX"] = "Este script es de pago, consíguelo solo en https://dsc.gg/hollowhub",
+    ["AR"] = "Este script es pago, consíguelo solo en https://dsc.gg/hollowhub",
+    ["FR"] = "Ce script est payant, obtenez-le uniquement sur https://dsc.gg/hollowhub",
+    ["DE"] = "Dieses Skript ist kostenpflichtig, hol es dir nur unter https://dsc.gg/hollowhub",
+    ["IT"] = "Questo script è a pagamento, ottienilo solo su https://dsc.gg/hollowhub",
+    ["RU"] = "Этот скрипт платный, получите его только на https://dsc.gg/hollowhub",
+    ["CN"] = "此脚本为付费脚本,仅在 https://dsc.gg/hollowhub 获取",
+    ["JP"] = "このスクリプトは有料です。https://dsc.gg/hollowhub でのみ入手してください",
+    ["KR"] = "이 스크립트는 유료입니다. https://dsc.gg/hollowhub 에서만 받으세요",
+    ["TR"] = "Bu script ücretlidir, sadece https://dsc.gg/hollowhub adresinden alın",
+    ["PL"] = "Ten skrypt jest płatny, pobierz go tylko na https://dsc.gg/hollowhub",
+    ["NL"] = "Dit script is betaald, krijg het alleen op https://dsc.gg/hollowhub",
+    ["DEFAULT"] = "This script is paid, get it only at https://dsc.gg/hollowhub"
+}
+
+local watermark = Instance.new("TextLabel")
+watermark.Size = UDim2.new(0, 400, 0, 25)
+watermark.Position = UDim2.new(0.5, -200, 0, 10)
+watermark.BackgroundTransparency = 1
+watermark.Text = "Loading..."
+watermark.TextColor3 = Color3.fromRGB(255, 0, 0)
+watermark.TextSize = 14
+watermark.Font = Enum.Font.Arcade
+watermark.TextStrokeTransparency = 0.5
+watermark.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+watermark.ZIndex = 999999999
+watermark.Parent = screenGui
+
+task.spawn(function()
+    local success, result = pcall(function()
+        return game:HttpGetAsync("https://ipapi.co/json/")
+    end)
+    
+    if success and result then
+        local parseSuccess, data = pcall(function()
+            return HttpService:JSONDecode(result)
+        end)
+        
+        if parseSuccess and data and data.country_code then
+            local countryCode = data.country_code
+            watermark.Text = translations[countryCode] or translations["DEFAULT"]
+        else
+            watermark.Text = translations["DEFAULT"]
+        end
+    else
+        watermark.Text = translations["DEFAULT"]
+    end
+end)
+
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 40, 0, 40)
+toggleButton.Position = UDim2.new(0, 10, 0.5, -20)
+toggleButton.BackgroundColor3 = Color3.fromRGB(75, 0, 130)
+toggleButton.BorderSizePixel = 0
+toggleButton.Text = "HJ"
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.TextSize = 12
+toggleButton.Font = Enum.Font.Arcade
+toggleButton.Parent = screenGui
+
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(0, 6)
+toggleCorner.Parent = toggleButton
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 240, 0, 280)
+mainFrame.Position = UDim2.new(0.5, -120, 0.5, -140)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 6)
+uiCorner.Parent = mainFrame
+
+local titleBar = Instance.new("Frame")
+titleBar.Size = UDim2.new(1, 0, 0, 26)
+titleBar.BackgroundColor3 = Color3.fromRGB(75, 0, 130)
+titleBar.BorderSizePixel = 0
+titleBar.Parent = mainFrame
+
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 6)
+titleCorner.Parent = titleBar
+
+local titleFix = Instance.new("Frame")
+titleFix.Size = UDim2.new(1, 0, 0, 8)
+titleFix.Position = UDim2.new(0, 0, 1, -8)
+titleFix.BackgroundColor3 = Color3.fromRGB(75, 0, 130)
+titleFix.BorderSizePixel = 0
+titleFix.Parent = titleBar
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -10, 1, 0)
+title.Position = UDim2.new(0, 5, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "HOLLOW JOINER"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextSize = 12
+title.Font = Enum.Font.Arcade
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = titleBar
+
+local tabFrame = Instance.new("Frame")
+tabFrame.Size = UDim2.new(1, -14, 0, 22)
+tabFrame.Position = UDim2.new(0, 7, 0, 32)
+tabFrame.BackgroundTransparency = 1
+tabFrame.Parent = mainFrame
+
+local serversTab = Instance.new("TextButton")
+serversTab.Size = UDim2.new(0.5, -2, 1, 0)
+serversTab.Position = UDim2.new(0, 0, 0, 0)
+serversTab.BackgroundColor3 = Color3.fromRGB(75, 0, 130)
+serversTab.BorderSizePixel = 0
+serversTab.Text = "SERVERS"
+serversTab.TextColor3 = Color3.fromRGB(255, 255, 255)
+serversTab.TextSize = 9
+serversTab.Font = Enum.Font.Arcade
+serversTab.Parent = tabFrame
+
+local serversCorner = Instance.new("UICorner")
+serversCorner.CornerRadius = UDim.new(0, 3)
+serversCorner.Parent = serversTab
+
+local autoJoinTab = Instance.new("TextButton")
+autoJoinTab.Size = UDim2.new(0.5, -2, 1, 0)
+autoJoinTab.Position = UDim2.new(0.5, 2, 0, 0)
+autoJoinTab.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+autoJoinTab.BorderSizePixel = 0
+autoJoinTab.Text = "AUTO JOIN"
+autoJoinTab.TextColor3 = Color3.fromRGB(200, 200, 200)
+autoJoinTab.TextSize = 9
+autoJoinTab.Font = Enum.Font.Arcade
+autoJoinTab.Parent = tabFrame
+
+local autoJoinCorner = Instance.new("UICorner")
+autoJoinCorner.CornerRadius = UDim.new(0, 3)
+autoJoinCorner.Parent = autoJoinTab
+
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Size = UDim2.new(1, -14, 1, -64)
+scrollFrame.Position = UDim2.new(0, 7, 0, 60)
+scrollFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+scrollFrame.BorderSizePixel = 0
+scrollFrame.ScrollBarThickness = 3
+scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(75, 0, 130)
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollFrame.Parent = mainFrame
+
+local scrollCorner = Instance.new("UICorner")
+scrollCorner.CornerRadius = UDim.new(0, 4)
+scrollCorner.Parent = scrollFrame
+
+local listLayout = Instance.new("UIListLayout")
+listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+listLayout.Padding = UDim.new(0, 5)
+listLayout.Parent = scrollFrame
+
+local autoJoinFrame = Instance.new("Frame")
+autoJoinFrame.Size = UDim2.new(1, -14, 1, -64)
+autoJoinFrame.Position = UDim2.new(0, 7, 0, 60)
+autoJoinFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+autoJoinFrame.BorderSizePixel = 0
+autoJoinFrame.Visible = false
+autoJoinFrame.Parent = mainFrame
+
+local autoJoinFrameCorner = Instance.new("UICorner")
+autoJoinFrameCorner.CornerRadius = UDim.new(0, 4)
+autoJoinFrameCorner.Parent = autoJoinFrame
+
+local minLabel = Instance.new("TextLabel")
+minLabel.Size = UDim2.new(1, -10, 0, 15)
+minLabel.Position = UDim2.new(0, 5, 0, 10)
+minLabel.BackgroundTransparency = 1
+minLabel.Text = "MIN PRICE"
+minLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+minLabel.TextSize = 9
+minLabel.Font = Enum.Font.Arcade
+minLabel.TextXAlignment = Enum.TextXAlignment.Left
+minLabel.Parent = autoJoinFrame
+
+local minInput = Instance.new("TextBox")
+minInput.Size = UDim2.new(1, -10, 0, 25)
+minInput.Position = UDim2.new(0, 5, 0, 28)
+minInput.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+minInput.BorderSizePixel = 0
+minInput.Text = "10M"
+minInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+minInput.TextSize = 10
+minInput.Font = Enum.Font.Arcade
+minInput.PlaceholderText = "Ex: 10M"
+minInput.Parent = autoJoinFrame
+
+local minInputCorner = Instance.new("UICorner")
+minInputCorner.CornerRadius = UDim.new(0, 3)
+minInputCorner.Parent = minInput
+
+local maxLabel = Instance.new("TextLabel")
+maxLabel.Size = UDim2.new(1, -10, 0, 15)
+maxLabel.Position = UDim2.new(0, 5, 0, 60)
+maxLabel.BackgroundTransparency = 1
+maxLabel.Text = "MAX PRICE"
+maxLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+maxLabel.TextSize = 9
+maxLabel.Font = Enum.Font.Arcade
+maxLabel.TextXAlignment = Enum.TextXAlignment.Left
+maxLabel.Parent = autoJoinFrame
+
+local maxInput = Instance.new("TextBox")
+maxInput.Size = UDim2.new(1, -10, 0, 25)
+maxInput.Position = UDim2.new(0, 5, 0, 78)
+maxInput.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+maxInput.BorderSizePixel = 0
+maxInput.Text = "1000M"
+maxInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+maxInput.TextSize = 10
+maxInput.Font = Enum.Font.Arcade
+maxInput.PlaceholderText = "Ex: 1000M or 1B"
+maxInput.Parent = autoJoinFrame
+
+local maxInputCorner = Instance.new("UICorner")
+maxInputCorner.CornerRadius = UDim.new(0, 3)
+maxInputCorner.Parent = maxInput
+
+local autoJoinToggle = Instance.new("TextButton")
+autoJoinToggle.Size = UDim2.new(1, -10, 0, 30)
+autoJoinToggle.Position = UDim2.new(0, 5, 0, 115)
+autoJoinToggle.BackgroundColor3 = Color3.fromRGB(75, 0, 130)
+autoJoinToggle.BorderSizePixel = 0
+autoJoinToggle.Text = "START AUTO JOIN"
+autoJoinToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+autoJoinToggle.TextSize = 10
+autoJoinToggle.Font = Enum.Font.Arcade
+autoJoinToggle.Parent = autoJoinFrame
+
+local autoJoinToggleCorner = Instance.new("UICorner")
+autoJoinToggleCorner.CornerRadius = UDim.new(0, 4)
+autoJoinToggleCorner.Parent = autoJoinToggle
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(1, -10, 0, 40)
+statusLabel.Position = UDim2.new(0, 5, 0, 155)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = "Status: Idle"
+statusLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+statusLabel.TextSize = 8
+statusLabel.Font = Enum.Font.Arcade
+statusLabel.TextXAlignment = Enum.TextXAlignment.Left
+statusLabel.TextYAlignment = Enum.TextYAlignment.Top
+statusLabel.TextWrapped = true
+statusLabel.Parent = autoJoinFrame
+
+local function makeDraggable(frame, dragArea)
+    local dragging = false
+    local dragInput
+    local dragStart
+    local startPos
+
+    local function updateDrag(input)
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+
+    dragArea.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    dragArea.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            updateDrag(input)
+        end
+    end)
+end
+
+makeDraggable(mainFrame, titleBar)
+makeDraggable(toggleButton, toggleButton)
+
+toggleButton.MouseButton1Click:Connect(function()
+    mainFrame.Visible = not mainFrame.Visible
+end)
+
+serversTab.MouseButton1Click:Connect(function()
+    scrollFrame.Visible = true
+    autoJoinFrame.Visible = false
+    serversTab.BackgroundColor3 = Color3.fromRGB(75, 0, 130)
+    serversTab.TextColor3 = Color3.fromRGB(255, 255, 255)
+    autoJoinTab.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    autoJoinTab.TextColor3 = Color3.fromRGB(200, 200, 200)
+end)
+
+autoJoinTab.MouseButton1Click:Connect(function()
+    scrollFrame.Visible = false
+    autoJoinFrame.Visible = true
+    autoJoinTab.BackgroundColor3 = Color3.fromRGB(75, 0, 130)
+    autoJoinTab.TextColor3 = Color3.fromRGB(255, 255, 255)
+    serversTab.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    serversTab.TextColor3 = Color3.fromRGB(200, 200, 200)
+end)
+
+-- FUNÇÕES DE FORMATAÇÃO E PARSING DO JSON
+
+local function parsePrice(priceStr)
+    if not priceStr or type(priceStr) ~= "string" then return 0 end
+    
+    priceStr = priceStr:gsub("%s", ""):upper()
+    
+    local num = tonumber(priceStr:match("([%d%.]+)"))
+    if not num then return 0 end
+    
+    if priceStr:find("B") then
+        return num * 1000
+    elseif priceStr:find("M") then
+        return num
+    elseif priceStr:find("K") then
+        return num / 1000
+    end
+    
+    return num
+end
+
+local function formatPrice(value)
+    if value >= 1000 then
+        return string.format("%.1fB", value / 1000)
+    else
+        return string.format("%.1fM", value)
+    end
+end
+
+local function normalizeInput(input)
+    local value = parsePrice(input)
+    return formatPrice(value)
+end
+
+-- Função para extrair dados do JSON formatado
+local function extractServerData(jsonData)
+    local data = {
+        valid = false,
+        messageId = nil,
+        petName = "Unknown",
+        petPrice = "N/A",
+        petPriceValue = 0,
+        players = "N/A",
+        jobId = nil,
+        placeId = nil
+    }
+    
+    -- Verifica se o JSON é válido
+    if not jsonData or not jsonData.success or not jsonData.message then
+        return data
+    end
+    
+    -- Extrai ID da mensagem
+    data.messageId = jsonData.message.id
+    
+    -- Verifica se tem embed
+    if not jsonData.message.embed then
+        return data
+    end
+    
+    local embed = jsonData.message.embed
+    
+    -- Extrai descrição (nome e preço do pet)
+    if embed.description then
+        -- Formato: "🔥 **1x Los Cucarachas $19.3M/s**"
+        local desc = embed.description
+        
+        -- Remove markdown e emojis
+        desc = desc:gsub("%*%*", ""):gsub("🔥%s*", "")
+        
+        -- Extrai nome do pet (entre o início e o $)
+        local petMatch = desc:match("(.-)%s*%$")
+        if petMatch then
+            data.petName = petMatch:match("^%s*(.-)%s*$") -- Remove espaços
+        end
+        
+        -- Extrai preço (depois do $)
+        local priceMatch = desc:match("%$(.-)$")
+        if priceMatch then
+            data.petPrice = "$" .. priceMatch:match("^%s*(.-)%s*$")
+            data.petPriceValue = parsePrice(priceMatch)
+        end
+    end
+    
+    -- Extrai campos (fields)
+    if embed.fields and type(embed.fields) == "table" then
+        for _, field in ipairs(embed.fields) do
+            -- Players info
+            if field.name and field.name:find("Server Info") and field.value then
+                data.players = field.value:match("Players:%s*(.-)$") or field.value
+            end
+            
+            -- Job ID
+            if field.name and field.name:find("Job ID") and field.value then
+                -- Remove ``` markdown
+                local jobIdMatch = field.value:match("```(.-)```")
+                if jobIdMatch then
+                    data.jobId = jobIdMatch:match("^%s*(.-)%s*$")
+                end
+            end
+            
+            -- Place ID (do script de join)
+            if field.name and field.name:find("Join Script") and field.value then
+                local placeIdMatch = field.value:match("TeleportToPlaceInstance%((%d+)")
+                if placeIdMatch then
+                    data.placeId = placeIdMatch
+                end
+            end
+        end
+    end
+    
+    -- Marca como válido se tiver os dados essenciais
+    if data.jobId and data.placeId and data.messageId then
+        data.valid = true
+    end
+    
+    return data
+end
+
+minInput.FocusLost:Connect(function()
+    minInput.Text = normalizeInput(minInput.Text)
+end)
+
+maxInput.FocusLost:Connect(function()
+    maxInput.Text = normalizeInput(maxInput.Text)
+end)
+
+local trackedServers = {}
+local autoJoinEnabled = false
+local autoJoinTarget = nil
+
+autoJoinToggle.MouseButton1Click:Connect(function()
+    autoJoinEnabled = not autoJoinEnabled
+    
+    if autoJoinEnabled then
+        autoJoinToggle.Text = "STOP AUTO JOIN"
+        autoJoinToggle.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+        statusLabel.Text = "Status: Waiting for servers..."
+        statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+    else
+        autoJoinToggle.Text = "START AUTO JOIN"
+        autoJoinToggle.BackgroundColor3 = Color3.fromRGB(75, 0, 130)
+        statusLabel.Text = "Status: Idle"
+        statusLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+        autoJoinTarget = nil
+    end
+end)
+
+local function tryAutoJoin()
+    if not autoJoinEnabled or not autoJoinTarget then return end
+    
+    task.spawn(function()
+        while autoJoinEnabled and autoJoinTarget do
+            pcall(function()
+                TeleportService:TeleportToPlaceInstance(
+                    tonumber(autoJoinTarget.placeId),
+                    autoJoinTarget.jobId,
+                    player
+                )
+            end)
+            task.wait(0.1)
+        end
+    end)
+end
+
+local function createServerButton(serverData)
+    if not serverData.valid or trackedServers[serverData.jobId] then
+        return
+    end
+    
+    trackedServers[serverData.jobId] = true
+    
+    -- Verifica Auto Join
+    if autoJoinEnabled then
+        local minPrice = parsePrice(minInput.Text)
+        local maxPrice = parsePrice(maxInput.Text)
+        
+        if serverData.petPriceValue >= minPrice and serverData.petPriceValue <= maxPrice then
+            autoJoinTarget = {
+                placeId = serverData.placeId,
+                jobId = serverData.jobId,
+                petName = serverData.petName,
+                petPrice = serverData.petPrice
+            }
+            
+            statusLabel.Text = string.format("Status: Joining %s - %s", serverData.petName, serverData.petPrice)
+            statusLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
+            
+            tryAutoJoin()
+            return
+        end
+    end
+    
+    -- Cria UI do servidor
+    local serverFrame = Instance.new("Frame")
+    serverFrame.Size = UDim2.new(1, -8, 0, 70)
+    serverFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    serverFrame.BorderSizePixel = 0
+    serverFrame.Parent = scrollFrame
+    
+    local frameCorner = Instance.new("UICorner")
+    frameCorner.CornerRadius = UDim.new(0, 4)
+    frameCorner.Parent = serverFrame
+    
+    local serverName = Instance.new("TextLabel")
+    serverName.Size = UDim2.new(1, -8, 0, 15)
+    serverName.Position = UDim2.new(0, 4, 0, 4)
+    serverName.BackgroundTransparency = 1
+    serverName.Text = serverData.petName
+    serverName.TextColor3 = Color3.fromRGB(200, 150, 255)
+    serverName.TextSize = 9
+    serverName.Font = Enum.Font.Arcade
+    serverName.TextXAlignment = Enum.TextXAlignment.Left
+    serverName.TextTruncate = Enum.TextTruncate.AtEnd
+    serverName.Parent = serverFrame
+    
+    local priceLabel = Instance.new("TextLabel")
+    priceLabel.Size = UDim2.new(1, -8, 0, 12)
+    priceLabel.Position = UDim2.new(0, 4, 0, 19)
+    priceLabel.BackgroundTransparency = 1
+    priceLabel.Text = serverData.petPrice
+    priceLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+    priceLabel.TextSize = 8
+    priceLabel.Font = Enum.Font.Arcade
+    priceLabel.TextXAlignment = Enum.TextXAlignment.Left
+    priceLabel.Parent = serverFrame
+    
+    local serverInfo = Instance.new("TextLabel")
+    serverInfo.Size = UDim2.new(1, -8, 0, 11)
+    serverInfo.Position = UDim2.new(0, 4, 0, 31)
+    serverInfo.BackgroundTransparency = 1
+    serverInfo.Text = serverData.players
+    serverInfo.TextColor3 = Color3.fromRGB(150, 150, 150)
+    serverInfo.TextSize = 7
+    serverInfo.Font = Enum.Font.Arcade
+    serverInfo.TextXAlignment = Enum.TextXAlignment.Left
+    serverInfo.Parent = serverFrame
+    
+    local joinButton = Instance.new("TextButton")
+    joinButton.Size = UDim2.new(0, 70, 0, 18)
+    joinButton.Position = UDim2.new(0.5, -35, 1, -22)
+    joinButton.BackgroundColor3 = Color3.fromRGB(75, 0, 130)
+    joinButton.BorderSizePixel = 0
+    joinButton.Text = "ENTRAR"
+    joinButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    joinButton.TextSize = 9
+    joinButton.Font = Enum.Font.Arcade
+    joinButton.Parent = serverFrame
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 3)
+    btnCorner.Parent = joinButton
+    
+    joinButton.MouseButton1Click:Connect(function()
+        if serverData.placeId and serverData.jobId then
+            TeleportService:TeleportToPlaceInstance(tonumber(serverData.placeId), serverData.jobId, player)
+        end
+    end)
+    
+    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 8)
+end
+
+-- Sistema de API
+local API_URL = ""
+local lastMessageId = ""
+
+task.spawn(function()
+    local success, result = pcall(function()
+        return game:HttpGetAsync("https://pastefy.app/DzkIMosi/raw")
+    end)
+    
+    if success and result then
+        API_URL = result:match("^%s*(.-)%s*$")
+    end
+end)
+
+-- Loop principal de polling
+task.spawn(function()
+    while task.wait(0.01) do
+        if API_URL ~= "" then
+            local success, result = pcall(function()
+                return game:HttpGetAsync(API_URL)
+            end)
+            
+            if success and result then
+                local parseSuccess, jsonData = pcall(function()
+                    return HttpService:JSONDecode(result)
+                end)
+                
+                if parseSuccess and jsonData then
+                    -- Extrai dados formatados
+                    local serverData = extractServerData(jsonData)
+                    
+                    -- Verifica se é uma nova mensagem
+                    if serverData.valid and serverData.messageId ~= lastMessageId then
+                        lastMessageId = serverData.messageId
+                        
+                        -- Cria botão do servidor
+                        pcall(createServerButton, serverData)
+                    end
+                end
+            end
+        end
+    end
+end)
